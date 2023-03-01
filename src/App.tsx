@@ -10,42 +10,96 @@ import { SignUp } from './components/SignUp';
 import { Admin } from './components/Admin';
 import { DetailProduct } from './components/DetailProduct';
 import { Footer } from './components/Footer';
+import { Cart } from './components/Cart';
+import {useState} from 'react'
 
-const db:DbType = {
-  currentUser: null,
-  users: [],
-  products: [],
-  categories: [],
-  cart: [],
-}
 
-export const dbContext = React.createContext(db)
 
 function App() {
 
+  const [db, setDb] = useState<DbType>({
+    currentUser: null,
+    users: [
+      {
+        id:0,
+        firstName: "Admin",
+        surname: '',
+        email: 'admin',
+        password: 'admin',
+        isAdmin: true,
+      }
+    ],
+    products: [],
+    categories: [],
+    cart: [],
+  })
+  
+  console.log(db)
+
+  
+  const signUp = (data:UserType) => {
+  
+    setDb(prev => ({
+      ...prev,
+      users: [...prev.users, data],
+      currentUser: data
+    }))
+  } 
+
+  const signIn = (data:SignInType) => {
+  
+    const findUser = db.users.find(user => user.email === data.email && user.password === data.password)
+    
+    if (findUser) {
+      setDb(prev => ({
+        ...prev,
+        currentUser: findUser
+      }))
+    }
+  } 
+
+  const createProduct = (data:ProductType) => {
+    debugger
+      setDb(prev => ({
+        ...prev,
+        products: [...prev.products, data]
+      }))
+  } 
+
+  const logOut = () => {
+      setDb(prev => ({
+        ...prev,
+        currentUser: null
+      }))
+  } 
+
   return (
-    <dbContext.Provider value={db}>
       <BrowserRouter>
         <div className="App">
-          <Header />
+          <Header onCallback={logOut} db={db}/>
           <Routes>
-            <Route path='/' element={<Products />} />
-            <Route path='/signIn' element={<SignIn />} />
-            <Route path='/signup' element={<SignUp />} />
-            <Route path='/admin' element={<Admin />} />
+            <Route path='/' element={<Products db={db} />} />
+            <Route path='/signIn' element={<SignIn db={db} onCallback={signIn}/>} />
+            <Route path='/signUp' element={<SignUp db={db} onCallback={signUp}/>} />
+            <Route path='/admin' element={<Admin onCallback={createProduct} db={db} />} />
+            <Route path='/cart' element={<Cart />} />
             <Route path='/product/:id' element={<DetailProduct />} />
           </Routes>
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </BrowserRouter>
-    </dbContext.Provider>
   );
 }
 
 export default App;
 
 
-type DbType = {
+export type SignInType = {
+  email: string,
+  password: string
+}
+
+export type DbType = {
   currentUser: UserType | null,
   users: UserType[],
   products: ProductType[],
@@ -53,7 +107,7 @@ type DbType = {
   cart: ProductType[],
 }
 
-type UserType = {
+export type UserType = {
   id: number,
   firstName: string,
   surname: string,
@@ -62,15 +116,14 @@ type UserType = {
   isAdmin: boolean
 }
 
-type ProductType = {
+export type ProductType = {
   id: number,
   title: string,
   description: string,
   price: number,
-  categoryId: number
 }
 
-type CategoryType = {
+export type CategoryType = {
   id: number,
   title: string
 }

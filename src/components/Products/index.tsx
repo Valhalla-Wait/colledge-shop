@@ -1,15 +1,18 @@
 import { useContext } from "react";
-import { dbContext } from "../../App";
+import {DbType } from "../../App";
 
-export const Products = () => {
-    const { products } = useContext(dbContext);
+type PropsType = {
+    db: DbType
+}
+
+export const Products = ({db}:PropsType) => {
     return (
         <section className="products content">
             <div className="products-title">
                 <h2>Товары</h2>
             </div>
             <div className="products-list">
-                {products.map(product => (
+                {db.products.map(product => (
                     <div key={product.id} className="products-item">
                         <img src="" alt="" />
                         <div className="products-item-info">

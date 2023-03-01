@@ -1,15 +1,20 @@
 import { useContext } from "react";
 import { NavLink } from "react-router-dom"
-import { dbContext } from "../../App";
+import { DbType } from "../../App";
 
-export const Header = () => {
-    const { currentUser } = useContext(dbContext);
+type PropsType = {
+    db: DbType
+    onCallback: () => void
+}
+
+export const Header = ({db, onCallback}:PropsType) => {
+    console.log(db.currentUser)
     return (
         <header>
             <div className="logo header-link">
                 <NavLink to="/"><h1>Магазин</h1></NavLink></div>
             {
-                (currentUser && currentUser.isAdmin) && <div className="admin-panel header-link">
+                (db.currentUser && db.currentUser.isAdmin) && <div className="admin-panel header-link">
                     <NavLink to="/admin">
                         Admin Panel
                     </NavLink>
@@ -17,14 +22,18 @@ export const Header = () => {
             }
             <div className="auth header-link">
                 {
-                    currentUser ?
+                    db.currentUser ?
                         <>
                             <div>
-                                {currentUser.firstName} {currentUser.surname}
+                                {db.currentUser.firstName} {db.currentUser.surname}
                             </div>
                             |
                             <NavLink to="/cart">
                                 Корзина
+                            </NavLink>
+                            |
+                            <NavLink onClick={() => onCallback()} to="/">
+                                LogOut
                             </NavLink>
                         </>
                         :
