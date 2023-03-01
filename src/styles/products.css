@@ -1,0 +1,8 @@
+.products {
+    
+}
+
+.products-list {
+    display: flex;
+    gap: 30px;
+}
